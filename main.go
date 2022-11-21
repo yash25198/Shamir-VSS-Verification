@@ -18,7 +18,7 @@ func pow(x uint64, y uint64, mod uint64) uint64 {
 
 func verify(commitments []uint64, x uint64, y uint64, generator uint64, fieldPrime uint64, groupPrime uint64) bool {
 	var lhs uint64 = 1
-	var rhs uint64 = 1
+	var rhs uint64
 	var j uint64 = 0
 	for i := 0; i < len(commitments); i++ {
 		lhs *= pow(commitments[i], pow(x, j, fieldPrime), groupPrime)
@@ -35,7 +35,7 @@ func main() {
 	fmt.Scan(&n)
 
 	commitments := make([]uint64, n)
-	fmt.Printf("Enter %d commitments : ",n)
+	fmt.Printf("Enter %d commitments : ", n)
 	for i = 0; i < n; i++ {
 		var x uint64
 		fmt.Scan(&x)
