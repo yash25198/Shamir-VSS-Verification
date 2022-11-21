@@ -1,25 +1,27 @@
 package main
+
 import (
 	"fmt"
 )
-func pow(x uint64,y uint64,mod uint64) uint64 {
+
+func pow(x uint64, y uint64, mod uint64) uint64 {
 	var res uint64 = 1
 	for y > 0 {
-		if y & 2 == 1 {
-			res *= x % mod;
+		if y&2 == 1 {
+			res *= x % mod
 		}
-		y >>= 1;
-		x *= x % mod;
+		y >>= 1
+		x *= x % mod
 	}
-	return res;
+	return res
 }
 
-func verify(commitments []uint64, x uint64, y uint64, generator uint64,groupPrime uint64) bool {
+func verify(commitments []uint64, x uint64, y uint64, generator uint64, fieldPrime uint64, groupPrime uint64) bool {
 	var lhs uint64 = 1
 	var rhs uint64 = 1
 	var j uint64 = 0
 	for i := 0; i < len(commitments); i++ {
-		lhs *= pow(commitments[i], pow(x, j ,groupPrime), groupPrime)
+		lhs *= pow(commitments[i], pow(x, j, fieldPrime), groupPrime)
 		j++
 	}
 	rhs = pow(generator, y, groupPrime)
@@ -33,9 +35,10 @@ func main() {
 	fmt.Scan(&n)
 
 	commitments := make([]uint64, n)
+	fmt.Printf("Enter %d commitments : ",n)
 	for i = 0; i < n; i++ {
 		var x uint64
-		fmt.Scan(&x);
+		fmt.Scan(&x)
 		commitments = append(commitments, x)
 	}
 
@@ -55,7 +58,11 @@ func main() {
 	fmt.Print("Enter GroupPrime : ")
 	fmt.Scan(&groupPrime)
 
-	if verify(commitments , x, y, generator, groupPrime) {
+	var fieldPrime uint64
+	fmt.Print("Enter FeildPrime : ")
+	fmt.Scan(&fieldPrime)
+
+	if verify(commitments, x, y, generator, fieldPrime, groupPrime) {
 		fmt.Println("Verified")
 	} else {
 		fmt.Println("Not Verified")
