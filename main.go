@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 )
-
+//todo : res should be replaced with different data type
 func pow(x uint64, y uint64, mod uint64) uint64 {
 	var res uint64 = 1
 	for y > 0 {
-		if y&2 == 1 {
-			res *= x % mod
+		if y&1 == 1 {
+			res = ((res % mod) * (x % mod)) % mod
 		}
 		y >>= 1
-		x *= x % mod
+		x = ((x % mod) * (x % mod)) % mod
 	}
 	return res
 }
@@ -21,7 +21,7 @@ func verify(commitments []uint64, x uint64, y uint64, generator uint64, fieldPri
 	var rhs uint64
 	var j uint64 = 0
 	for i := 0; i < len(commitments); i++ {
-		lhs *= pow(commitments[i], pow(x, j, fieldPrime), groupPrime)
+		lhs = ((lhs % groupPrime) * (pow(commitments[i], pow(x, j, fieldPrime), groupPrime) % groupPrime)) % groupPrime
 		j++
 	}
 	rhs = pow(generator, y, groupPrime)
@@ -29,26 +29,28 @@ func verify(commitments []uint64, x uint64, y uint64, generator uint64, fieldPri
 }
 
 func main() {
-	var n uint64
-	var i uint64
+	var n int
 	fmt.Print("Enter the number of commitments : ")
 	fmt.Scan(&n)
 
 	commitments := make([]uint64, n)
 	fmt.Printf("Enter %d commitments : ", n)
-	for i = 0; i < n; i++ {
-		var x uint64
-		fmt.Scan(&x)
-		commitments = append(commitments, x)
+	for i := 0; i < n; i++ {
+		fmt.Scan(&commitments[i])
 	}
 
-	var x uint64
-	fmt.Print("Enter x : ")
-	fmt.Scan(&x)
+	var m int
+	fmt.Print("Enter the number of shares : ")
+	fmt.Scan(&m)
 
-	var y uint64
-	fmt.Print("Enter y : ")
-	fmt.Scan(&y)
+	x := make([]uint64, m)
+	y := make([]uint64, m)
+	for i := 0; i < m; i++ {
+		fmt.Printf("Enter x%d : ", i)
+		fmt.Scan(&x[i])
+		fmt.Printf("Enter y%d : ", i)
+		fmt.Scan(&y[i])
+	}
 
 	var generator uint64
 	fmt.Print("Enter generator : ")
@@ -62,9 +64,11 @@ func main() {
 	fmt.Print("Enter FeildPrime : ")
 	fmt.Scan(&fieldPrime)
 
-	if verify(commitments, x, y, generator, fieldPrime, groupPrime) {
-		fmt.Println("Verified")
-	} else {
-		fmt.Println("Not Verified")
+	for i := 0; i < m; i++ {
+		if verify(commitments, x[i], y[i], generator, fieldPrime, groupPrime) {
+			fmt.Printf("%d Verified", i)
+		} else {
+			fmt.Printf("%d Not Verified", i)
+		}
 	}
 }
